@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="user-id" content="{{ current_user.account_id }}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/VotePage.css') }}">
+    <script src="{{ url_for('static', filename='js/admin/VotePage.js') }}"></script>
+
+    <title>Опросы</title>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="header-title">Опросы</h1>
+            <div class="header-icons">
+                <i class="material-icons header-icon" id="addVoteBtn">add</i>
+                <select id="GroupTag" class="header-select" name="group">
+                    <option value="Для всех">Для всех</option>
+                    {% for group in group_list %}
+                    <option value="{{group.group_id}}">{{ group.group_name }}</option>
+                    {%endfor%}                      
+                </select>
+            
+            </div>
+        </header>
+
+        <div class="poll-tabs">
+            <!-- Отправка url запросов на сервер для проведения фильтрации -->
+            <a href="{{ url_for('admin.admin_main_votes', user_id=current_user.account_id, tab='All')}}"
+             class="poll-tab {% if active_tab == 'All' %}active{% endif %}">Все</a>
+
+            <a href="{{ url_for('admin.admin_main_votes', user_id=current_user.account_id, tab='Active')}}"
+            class="poll-tab {% if active_tab == 'Active' %}active{% endif %}">Открытые</a>
+
+            <a href="{{ url_for('admin.admin_main_votes', user_id=current_user.account_id, tab='Closed')}}"
+            class="poll-tab {% if active_tab == 'Closed' %}active{% endif %}">Закрытые</a>
+            
+        </div>
+
+        
+        <div class="poll-section">
+            {% for vote in votes %}
+            <div class="poll-card {{ 'poll-closed' if vote.v_status == 'Closed' }}" data-vote-id="{{ vote.vote_id }}" data-user-id="{{ current_user.account_id }}">
+                <h2 class="poll-title">{{ vote.title }}</h2>
+                <span class="vote-tag">{{ "Для всех" if vote.group_id == None else vote.group.group_name }}</span>
+                <div class="poll-progress">
+                    <div class="progress" style="width: 0%"></div>
+                </div>
+                <div class="poll-details">
+                    <span class="poll-status">0 ответов</span>
+                    <span class="poll-status">
+                        {% if vote.v_status == 'Closed' %}
+                            Закрыт
+                        {% else %}
+                            До {{ vote.deadline.strftime('%d %B %Y') }}
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="poll-actions">
+                    <i class="material-icons poll-action-icon" data-action="analytics" data-id="{{ vote.vote_id }}">bar_chart</i>
+                    <i class="material-icons poll-action-icon change-vote" data-action="status" data-id="{{ vote.vote_id }}">
+                        {{ 'lock' if vote.v_status == 'Active' else 'lock_open' }}
+                    </i>
+                    <i class="material-icons poll-action-icon" data-action="edit" data-id="{{ vote.vote_id }}">edit</i>
+                    <i class="material-icons poll-action-icon delete-vote" data-action="delete" data-id="{{ vote.vote_id }}">delete</i>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <nav>
+            <a href="{{ url_for('admin.admin_main_posts', user_id=current_user.account_id) }}" class="nav-item ">
+                <i class="material-icons">announcement</i>
+                <span>Объявление</span>
+            </a>
+            <a href="{{ url_for('admin.admin_main_events', user_id=current_user.account_id) }}" class="nav-item">
+                <i class="material-icons">event</i>
+                <span>События</span>
+            </a>
+            <a href="{{ url_for('admin.admin_main_view', user_id=current_user.account_id) }}" class="nav-item">
+                <i class="material-icons">home</i>
+                <span>Главная</span>
+            </a>
+            <a href="" class="nav-item active">
+                <i class="material-icons">poll</i>
+                <span>Опросы</span>
+            </a>
+            <a href="{{ url_for('admin.admin_main_group', user_id=current_user.account_id) }}" class="nav-item">
+                <i class="material-icons">group</i>
+                <span>Группа</span>
+            </a>
+        </nav>
+        
+        <div id="pollModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modalTitle" class="modal-title">Создание опроса</h2>
+                    <button id="closeModal" class="modal-close">&times;</button>
+                </div>
+                <form id="pollForm" class="modal-form", action="{{ url_for('admin.admin_main_votes', user_id=current_user.account_id) }}", method="POST">
+                    <input type="hidden" name="group_id" value="{{ request.args.get('group', '') }}">
+                    <input type="hidden" id="action" name="action" value="create">
+                    <div class="form-group">
+                        <label for="pollTitle" class="form-label">Название опроса</label>
+                        <input 
+                            type="text" 
+                            id="pollTitle" 
+                            name = 'pollTitle'
+                            class="form-input" 
+                            required 
+                            placeholder="Введите название опроса"
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label for="pollDeadline" class="form-label">Дата окончания</label>
+                        <input 
+                            type="date" 
+                            id="pollDeadline"
+                            name = 'pollDate' 
+                            class="form-input" 
+                            required>
+                    </div>
+                    <div id="pollOptions">
+                        <div class="form-group">
+                            <label class="form-label">Варианты ответов</label>
+                            <div id="optionsContainer">
+                                <input 
+                                    type="text" 
+                                    name = 'pollVar'
+                                    class="form-input option-input" 
+                                    placeholder="Введите вариант ответа">
+                            </div>
+                            <button type="button" id="addOptionBtn" class="btn btn-cancel">+ Добавить вариант</button>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" id="cancelModal" class="btn btn-cancel">Отмена</button>
+                        <button type="submit" class="btn btn-save">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+            <!-- <div id="pollAnalytModal" class="modalAnalyt">
+                <div class="modal-contentAnalyt">
+                    <div class="modal-headerAnalyt">
+                        <h2 id="modalTitleAnalyt" class="modal-titleAnalyt">Аналитика опроса</h2>
+                    </div>
+                    <div class="modal-details">
+                        <div class="modal-detail">
+                            <div class="modal-label">вариант ответа 1</div>
+                            <div class="modal-value">кол-во ответов </div>
+                        </div>
+                        <div class="modal-detail">
+                            <div class="modal-label">вариант ответа 2</div>
+                            <div class="modal-value">кол-во ответов</div>
+                        </div>
+
+
+
+                    </div>
+                    <div class="modal-footerAnalyt">
+                        
+                        <button id="closeAnalytModal" class="btn btn-secondary">Закрыть</button>
+                    </div>
+                </div>
+            </div> -->
+
+</body>
+</html>

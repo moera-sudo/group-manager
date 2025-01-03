@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="user-id" content="{{ current_user.account_id }}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/student/PAPage.css') }}">
+    <script src="{{ url_for('static', filename='js/student/PAPage.js') }}"></script>
+    <title>Личный кабинет</title>
+       
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="section-title">Личный кабинет</h1>
+            <div class="header-icons">
+                <a href="{{ url_for('student.student_main_view', user_id=current_user.account_id) }}"><i class="material-icons header-icon">home</i></a>
+                <a href="{{ url_for('auth.log_out', user_id=current_user.account_id) }}"><i class="material-icons header-icon">logout</i></a>
+            </div>
+        </header>
+
+        <section class="profile-section">
+            <div class="profile-avatar">
+                <i class="material-icons">account_circle</i>
+            </div>
+            <div class="profile-name">{{ acc_info.name }}</div>
+            <div class="profile-email">{{ acc_info.email }}</div>
+        </section>
+
+
+        <div class="poll-tabs">
+            <a href="{{ url_for('student.student_main_pa', user_id=current_user.account_id, tab='student') }}" 
+            class="poll-tab {% if active_tab == 'student' %}active{% endif %}">Студент</a>
+            <a href="{{ url_for('student.student_main_pa', user_id=current_user.account_id, tab='family') }}" 
+            class="poll-tab {% if active_tab == 'family' or active_tab=='family_dad' or active_tab=='family_mom' or active_tab=='family_guardian' %}active{% endif %}">Опекуны</a>
+            <a href="{{ url_for('student.student_main_pa', user_id=current_user.account_id, tab='adress') }}" 
+            class="poll-tab {% if active_tab == 'adress' or active_tab=='adressReg' or active_tab == 'adressLive' or active_tab=='adressCameFrom'%}active{% endif %}">Адрес</a>
+            
+        </div>
+
+        <br>
+
+
+        <section class="section stud-section {% if active_tab == 'student' %}active{% endif %}" id="student-section">
+            <div class="detail-label" style="transform: translate(-50%, -50%); position: absolute; left: 50%; text-align: center;">Основная информация</div>
+            <br><br>
+            <form action="{{ url_for('student.student_main_pa', user_id=current_user.account_id)}}" method="POST" id="form_id" onsubmit="event.preventDefault();">
+                <input type="hidden" name="current_tab" value="{{ active_tab }}">
+                <div class="profile-details">
+                    <div class="profile-detail">
+                        <div class="detail-label">Фамилия</div>
+                        <input class="edit-input" name="surname" value="{{ info.surname if info and info.surname is not none else '' }}" disabled=true>
+                    </div>
+                    <div class="profile-detail">
+                        <div class="detail-label">Имя</div>
+                        <input class="edit-input" name="name" value="{{ info.name if info and info.name is not none else '' }}" disabled=true>
+                    </div>
+                    <div class="profile-detail">
+                        <div class="detail-label">Отчество</div>
+                        <input class="edit-input" name="last_name" value="{{ info.last_name if info and info.last_name is not none else '' }}" disabled=true>
+                    </div>
+                    <div class="profile-detail">
+                        <div class="detail-label">Дата рождения</div>
+                        <input class="edit-input" name="birthday" type="date" value="{{ info.birthday.strftime('%Y-%m-%d') if info and info.birthday is not none else '' }}" disabled=true>
+                    </div>
+                    <div class="profile-detail">
+                        <div class="detail-label">ИИН</div>
+                        <input class="edit-input" name="iin" value="{{ info.iin if info and info.iin is not none else '' }}" disabled=true>
+                    </div>
+                    <div class="profile-detail">
+                        <div class="detail-label">Телефон</div>
+                        <input class="edit-input" name="phonenumber" value="{{ info.phone_number if info and info.phone_number is not none else '' }}" disabled=true>
+                    </div>
+                    <div class="profile-detail">
+                        <div class="detail-label">Пол</div>
+                        <select class="type-select-disabled" name="gender" id="info" style="width: 40%;" form="form_id">
+                            <option value="">Выберите</option>
+                            <option value="Мужской" {% if info and info.gender == 'Мужской' %}selected{% endif %}>Мужской</option>
+                            <option value="Женский" {% if info and info.gender == 'Женский' %}selected{% endif %}>Женский</option>
+                        </select>
+                    </div>
+                    <div class="profile-detail">
+                        <div class="detail-label">Тип обучения</div>
+                        <select class="type-select-disabled" name="education_type" id="info1" style="width: 40%;" form="form_id">
+                            <option value="">Выберите</option>
+                            <option value="Грант" {% if info and info.education_type == 'Грант' %}selected{% endif %}>Грант</option>
+                            <option value="Бюджет" {% if info and info.education_type == 'Бюджет' %}selected{% endif %}>Бюджет</option>
+                        </select>
+                    </div>
+                    <div class="profile-detail">
+                        <div class="detail-label">Курс</div>
+                        <select class="type-select-disabled" name="course" id="info2" style="width: 40%;" form="form_id">
+                            <option value="">Выберите</option>
+                            <option value="1" {% if info and info.course == 1 %}selected{% endif %}>1</option>
+                            <option value="2" {% if info and info.course == 2 %}selected{% endif %}>2</option>
+                            <option value="3" {% if info and info.course == 3 %}selected{% endif %}>3</option>
+                        </select>
+                    </div>
+                </div>
+        
+                <br><br>
+                <div class="detail-label" style="transform: translate(-50%, -50%); position: absolute; left: 50%; text-align: center;">Дополнительная информация</div>
+                <br><br>
+                <div class="profile-details">
+                    <div class="profile-detail">
+                        <div class="detail-label">Хобби</div>
+                        <input class="edit-input" name="hobby" value="{{ info.hobby if info and info.hobby is not none else '' }}" disabled=true>
+                    </div>
+                    <div class="profile-detail">
+                        <div class="detail-label">Особые потребности</div>
+                        <select class="type-select-disabled" name="special_needs" id="studentrequire" style="width: 40%;">
+                            <option value="">Выберите</option>
+                            <option value="Отсутствуют" {% if info and info.special_needs == 'Отсутствуют' %}selected{% endif %}>Отсутствуют</option>
+                            <option value="Присутствуют" {% if info and info.special_needs == 'Присутствуют' %}selected{% endif %}>Присутствуют</option>
+                        </select>
+                    </div>
+                    <div class="profile-detail" id="studentcategory" style="display: {% if info and info.special_needs == 'Присутствуют' %}flex{% else %}none{% endif %}">
+                        <div class="detail-label">Инвалид</div>
+                        <select class="type-select-disabled" name="is_invalid" id="selectstudentcategory" style="width: 60%;">
+                            <option value="">Выберите</option>
+                            <option value="Нет" {% if info and info.is_invalid == 'Нет' %}selected{% endif %}>Нет</option>
+                            <option value="Да" {% if info and info.is_invalid == 'Да' %}selected{% endif %}>Да</option>
+                        </select>
+                    </div>
+                    <div class="profile-detail" id="studentcategory" style="display: {% if info and info.special_needs == 'Присутствуют' %}flex{% else %}none{% endif %}">
+                        <div class="detail-label">Психофизические особенности</div>
+                        <select class="type-select-disabled" name="is_have_psyphis_qualities" id="selectstudentcategory" style="width: 60%;">
+                            <option value="">Выберите</option>
+                            <option value="Нет" {% if info and info.is_have_psyphis_qualities == 'Нет' %}selected{% endif %}>Нет</option>
+                            <option value="Да" {% if info and info.is_have_psyphis_qualities == 'Да' %}selected{% endif %}>Да</option>
+                        </select>
+                    </div>
+                    <div class="profile-detail" id="studentcategory" style="display: {% if info and info.special_needs == 'Присутствуют' %}flex{% else %}none{% endif %}">
+                        <div class="detail-label">Состоит на учёте (ИДН)</div>
+                        <select class="type-select-disabled" name="is_ifm" id="selectstudentcategory" style="width: 60%;">
+                            <option value="">Выберите</option>
+                            <option value="Нет" {% if info and info.is_ifm == 'Нет' %}selected{% endif %}>Нет</option>
+                            <option value="Да" {% if info and info.is_ifm == 'Да' %}selected{% endif %}>Да</option>
+                        </select>
+                    </div>
+                    <div class="profile-detail" id="studentcategory" style="display: {% if info and info.special_needs == 'Присутствуют' %}flex{% else %}none{% endif %}">
+                        <div class="detail-label">Неуспевающий</div>
+                        <select class="type-select-disabled" name="is_underachiever" id="selectstudentcategory" style="width: 60%;">
+                            <option value="">Выберите</option>
+                            <option value="Нет" {% if info and info.is_underachiever == 'Нет' %}selected{% endif %}>Нет</option>
+                            <option value="Да" {% if info and info.is_underachiever == 'Да' %}selected{% endif %}>Да</option>
+                        </select>
+                    </div>
+                    <div class="profile-detail" id="studentcategory" style="display: {% if info and info.special_needs == 'Присутствуют' %}flex{% else %}none{% endif %}">
+                        <div class="detail-label">Сирота</div>
+                        <select class="type-select-disabled" name="is_orphan" id="selectstudentcategory" style="width: 60%;">
+                            <option value="">Выберите</option>
+                            <option value="Нет" {% if info and info.is_orphan == 'Нет' %}selected{% endif %}>Нет</option>
+                            <option value="Да" {% if info and info.is_orphan == 'Да' %}selected{% endif %}>Да</option>
+                        </select>
+                    </div>
+                </div>
+        
+                <br><br>
+                <div class="detail-label" style="transform: translate(-50%, -50%); position: absolute; left: 50%; text-align: center;">Гражданский статус</div>
+                <br><br>
+                <div class="profile-details">
+                    <div class="profile-detail">
+                        <div class="detail-label">Национальность</div>
+                        <input class="edit-input" name="nationality" value="{{ info.nationality if info and info.nationality is not none else '' }}" disabled=true>
+                    </div>
+                    <div class="profile-detail">
+                        <div class="detail-label">Гражданство</div>
+                        <input class="edit-input" name="citizenship" id="citizenchip" value="{{ info.citizenship if info.citizenship else 'Казахстан' }}" disabled=true>
+                    </div>
+                    <div class="profile-detail-reg" id="reg" style="display: none;">
+                        <div class="detail-label">Регистрация</div>
+                        <select class="type-select-disabled" name="registration" id="regselect">
+                            <option value="">Выберите</option>
+                            <option value="РВП" {% if info and info.registration == 'РВП' %}selected{% endif %}>РВП</option>
+                            <option value="ВНЖ" {% if info and info.registration == 'ВНЖ' %}selected{% endif %}>ВНЖ</option>
+                        </select>
+                    </div>
+                    <div class="profile-detail-reg" id="reg" style="display: none;">
+                        <div class="detail-label">Срок действия документа</div>
+                        <input class="edit-input" type="date" name="doc_validity_period" value="{ info.doc_validity_period.strftime('%Y-%m-%d') if info and info.doc_validity_period is not none else '' }">
+                    </div>
+                </div>
+        
+                <br><br>
+                <div class="detail-label" style="transform: translate(-50%, -50%); position: absolute; left: 50%; text-align: center;">Семья</div>
+                <br><br>
+                <div class="profile-details">
+                    <div class="profile-detail">
+                        <div class="detail-label">Социальный статус</div>
+                        <select class="type-select-disabled" name="social_status" id="selectfamilystat" style="width: 30%;">
+                            <option value="">Выберите</option>
+                            <option value="Неполная семья" {% if info and info.social_status == 'Неполная семья' %}selected{% endif %}>Неполная семья</option>
+                            <option value="Полная семья" {% if info and info.social_status == 'Полная семья' %}selected{% endif %}>Полная семья</option>
+                        </select>
+                    </div>
+                    <div class="profile-detail" id="familystatus" style="display: {% if info and info.social_status == 'Неполная семья' %}flex{% else %}none{% endif %}">
+                        <div class="detail-label">Потеря кормильца</div>
+                        <select class="type-select-disabled" name="lost_parent" id="selectfamilystatus" style="width: 30%;">
+                            <option value="">Выберите</option>
+                            <option value="Нету" {% if info and info.lost_parent == 'Нету' %}selected{% endif %}>Нету</option>
+                            <option value="Отец" {% if info and info.lost_parent == 'Отец' %}selected{% endif %}>Отец</option>
+                            <option value="Мать" {% if info and info.lost_parent == 'Мать' %}selected{% endif %}>Мать</option>
+                            <option value="Оба" {% if info and info.lost_parent == 'Оба' %}selected{% endif %}>Оба</option>
+                        </select>
+                    </div>
+                    <div class="profile-detail" id="familystatus" style="display: {% if info and info.social_status == 'Неполная семья' %}flex{% else %}none{% endif %}">
+                        <div class="detail-label">Пенсионеры родители</div>
+                        <select class="type-select-disabled" name="retired_parent" id="selectfamilystatus" style="width: 30%;">
+                            <option value="">Выберите</option>
+                            <option value="Нету" {% if info and info.retired_parents == 'Нету' %}selected{% endif %}>Нету</option>
+                            <option value="Отец" {% if info and info.retired_parents == 'Отец' %}selected{% endif %}>Отец</option>
+                            <option value="Мать" {% if info and info.retired_parents == 'Мать' %}selected{% endif %}>Мать</option>
+                            <option value="Оба" {% if info and info.retired_parents == 'Оба' %}selected{% endif %}>Оба</option>
+                        </select>
+                    </div>
+                    <div class="profile-detail" id="familystatus" style="display: {% if info and info.social_status == 'Неполная семья' %}flex{% else %}none{% endif %}">
+                        <div class="detail-label">Многодетная семья (4 и более)</div>
+                        <select class="type-select-disabled" name="is_large_family" id="selectfamilystatus" style="width: 30%;">
+                            <option value="">Выберите</option>
+                            <option value="Нет" {% if info and info.is_large_family == 'Нет' %}selected{% endif %}>Нет</option>
+                            <option value="Да" {% if info and info.is_large_family == 'Да' %}selected{% endif %}>Да</option>
+                        </select>
+                    </div>
+                    <div class="profile-detail">
+                        <div class="detail-label">Количество детей</div>
+                        <input class="edit-input" name="childs_count" value="{{ info.childs_count if info and info.childs_count is not none else '' }}" disabled=true>
+                    </div>
+                </div>
+                <br><br>
+        
+                <div class="section-actions">
+                    <button class="custom-button" form="form_id">Редактировать</button>
+                </div>
+            </form>
+            <br><br>
+        </section>
+
+        <section class="section family-section {% if active_tab == 'family' or active_tab=='family_dad' or active_tab=='family_mom' or active_tab=='family_guardian' %}active{% endif %}">
+
+            <div class="poll-tabs">
+                <a href="{{ url_for('student.student_main_pa', user_id=current_user.account_id, tab='family_mom') }}" 
+                class="poll-tab {% if active_tab == 'family_mom' %}active{% endif %}" data-tab="mum">Мать</a>
+                <a href="{{ url_for('student.student_main_pa', user_id=current_user.account_id, tab='family_dad') }}" 
+                class="poll-tab {% if active_tab == 'family_dad' %}active{% endif %}" data-tab="dad">Отец</a>
+                <a href="{{ url_for('student.student_main_pa', user_id=current_user.account_id, tab='family_guardian') }}" 
+                class="poll-tab {% if active_tab == 'family_guardian' %}active{% endif %}" data-tab="guardian">Опекун</a>
+            </div>
+                <section class="section mum-section {% if active_tab == 'family_mom' %}active{% endif %}">
+                    <form action="{{ url_for('student.student_main_pa', user_id=current_user.account_id)}}" method="POST" id="form_id" onsubmit="event.preventDefault();">
+                        <input type="hidden" name="current_tab" value="{{ active_tab }}">
+                        <div class="parent-details">
+                            <div class="type-selection">
+                                <div class="profile-detail">
+                                    <div class="detail-label">Тип родителя</div>
+                                    <select class="type-select-disabled" id='par' name="mother_parent_type">
+                                        <option value="">Выберите</option>
+                                        <option value="Мать" {% if family and family.mother_parent_type == 'Мать' %}selected{% endif %}>Мать</option>
+                                        <option value="Мачеха" {% if family and family.mother_parent_type == 'Мачеха' %}selected{% endif %}>Мачеха</option>
+                                        <option value="Нету" {% if family and family.mother_parent_type == 'Нету' %}selected{% endif %}>Нету</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="profile-details" style="display: {% if family and family.mother_parent_type == 'Нету' %}none{% else %}block{% endif %}">
+                                <div class="profile-detail">
+                                    <div class="detail-label">Фамилия</div>
+                                    <input class="edit-input" name="mother_surname" value="{{ family.mother_surname if family and family.mother_surname is not none else '' }}" disabled=true>
+                                </div>
+                                <div class="profile-detail">
+                                    <div class="detail-label">Имя</div>
+                                    <input class="edit-input" name="mother_name" value="{{ family.mother_name if family and family.mother_name is not none else '' }}" disabled=true>
+                                </div>
+                                <div class="profile-detail">
+                                    <div class="detail-label">Отчество</div>
+                                    <input class="edit-input" name="mother_last_name" value="{{ family.mother_last_name if family and family.mother_last_name is not none else '' }}" disabled=true>
+                                </div>
+                                <div class="profile-detail">
+                                    <div class="detail-label">Телефон</div>
+                                    <input class="edit-input" name="mother_phone_number" value="{{ family.mother_phone_number if family and family.mother_phone_number is not none else '' }}" disabled=true>
+                                </div>
+                                <div class="profile-detail">
+                                    <div class="detail-label">Дата Рождения </div>
+                                    <input class="edit-input" name="mother_birthday" type='date' value="{{ family.mother_birthday.strftime('%Y-%m-%d') if family and family.mother_birthday is not none else '' }}" disabled=true>
+                                </div>
+                                
+                                <br><br>
+                                <div class="detail-label" style="transform: translate(-50%, -50%); position: absolute; left: 50%; text-align: center;">Дополнительная информация</div>
+                                <br><br>
+                                
+                                <div class="profile-details">
+                                    <div class="profile-detail">
+                                        <div class="detail-label">Место Работы</div>
+                                        <input class="edit-input" name="mother_workplace" value="{{ family.mother_workplace if family and family.mother_workplace is not none else '' }}" disabled=true>
+                                    </div>
+                                    <div class="profile-detail">
+                                        <div class="detail-label">Сведения об образовании</div>
+                                        <select class="type-select-disabled" name='mother_education_info' id='educationmum' style="width: 65%;">
+                                            <option value="">Выберите уровень</option>
+                                            <option value="Нет образования" {% if family and family.mother_education_info == 'Нет образования' %}selected{% endif %}>Нет образования</option>
+                                            <option value="Начальное" {% if family and family.mother_education_info == 'Начальное' %}selected{% endif %}>Начальное</option>
+                                            <option value="Среднее" {% if family and family.mother_education_info == 'Среднее' %}selected{% endif %}>Среднее</option>
+                                            <option value="Среднее профессиональное" {% if family and family.mother_education_info == 'Среднее профессиональное' %}selected{% endif %}>Среднее профессиональное</option>
+                                            <option value="Высшее" {% if family and family.mother_education_info == 'Высшее' %}selected{% endif %}>Высшее</option>
+                                            <option value="Послевузовское" {% if family and family.mother_education_info == 'Послевузовское' %}selected{% endif %}>Послевузовское</option>
+                                        </select>
+                                    </div>
+                                    <div class="profile-detail">
+                                        <div class="detail-label">Социальный статус</div>
+                                        <select class="type-select-disabled" name='mother_social_status' id='Mumstatus' style="width: 50%">
+                                            <option value="">Выберите статус</option>
+                                            <option value="Безработный" {% if family and family.mother_social_status == 'Безработный' %}selected{% endif %}>Безработный</option>
+                                            <option value="Инвалид" {% if family and family.mother_social_status == 'Инвалид' %}selected{% endif %}>Инвалид</option>
+                                            <option value="Пенсионер" {% if family and family.mother_social_status == 'Пенсионер' %}selected{% endif %}>Пенсионер</option>
+                                            <option value="Работающий" {% if family and family.mother_social_status == 'Работающий' %}selected{% endif %}>Работающий</option>
+                                            <option value="Самозанятый" {% if family and family.mother_social_status == 'Самозанятый' %}selected{% endif %}>Самозанятый</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br><br>
+                        <div class="section-actions">
+                            <button class="custom-button" type="submit">Редактировать</button>
+                        </div>
+                        <br><br>
+                    </form>
+                </section>
+                
+                <!-- Секция для отца -->
+                <section class="section dad-section {% if active_tab == 'family_dad' %}active{% endif %}">
+                    <form action="{{ url_for('student.student_main_pa', user_id=current_user.account_id)}}" method="POST" id="form_id" onsubmit="event.preventDefault();">
+                        <input type="hidden" name="current_tab" value="{{ active_tab }}">
+                        <div class="parent-details">
+                            <div class="type-selection">
+                                <div class="profile-detail">
+                                    <div class="detail-label">Тип родителя</div>
+                                    <select class="type-select-disabled" id='par' name="father_parent_type">
+                                        <option value="">Выберите</option>
+                                        <option value="Отец" {% if family and family.father_parent_type == 'Отец' %}selected{% endif %}>Отец</option>
+                                        <option value="Отчим" {% if family and family.father_parent_type == 'Отчим' %}selected{% endif %}>Отчим</option>
+                                        <option value="Нету" {% if family and family.father_parent_type == 'Нету' %}selected{% endif %}>Нету</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="profile-details" style="display: {% if family and family.father_parent_type == 'Нету' %}none{% else %}block{% endif %}">
+                                <div class="profile-detail">
+                                    <div class="detail-label">Фамилия</div>
+                                    <input class="edit-input" name="father_surname" value="{{ family.father_surname if family and family.father_surname is not none else '' }}" disabled=true>
+                                </div>
+                                <div class="profile-detail">
+                                    <div class="detail-label">Имя</div>
+                                    <input class="edit-input" name="father_name" value="{{ family.father_name if family and family.father_name is not none else '' }}" disabled=true>
+                                </div>
+                                <div class="profile-detail">
+                                    <div class="detail-label">Отчество</div>
+                                    <input class="edit-input" name="father_last_name" value="{{ family.father_last_name if family and family.father_last_name is not none else '' }}" disabled=true>
+                                </div>
+                                <div class="profile-detail">
+                                    <div class="detail-label">Телефон</div>
+                                    <input class="edit-input" name="father_phone_number" value="{{ family.father_phone_number if family and family.father_phone_number is not none else '' }}" disabled=true>
+                                </div>
+                                <div class="profile-detail">
+                                    <div class="detail-label">Дата Рождения </div>
+                                    <input class="edit-input" name="father_birthday" type='date' value="{{ family.father_birthday.strftime('%Y-%m-%d') if family and family.father_birthday is not none else '' }}" disabled=true>
+                                </div>
+                                
+                                <br><br>
+                                <div class="detail-label" style="transform: translate(-50%, -50%); position: absolute; left: 50%; text-align: center;">Дополнительная информация</div>
+                                <br><br>
+                                
+                                <div class="profile-details">
+                                    <div class="profile-detail">
+                                        <div class="detail-label">Место Работы</div>
+                                        <input class="edit-input" name="father_workplace" value="{{ family.father_workplace if family and family.father_workplace is not none else '' }}" disabled=true>
+                                    </div>
+                                    <div class="profile-detail">
+                                        <div class="detail-label">Сведения об образовании</div>
+                                        <select class="type-select-disabled" name="father_education_info" id='educationdad' style="width: 65%;">
+                                            <option value="">Выберите уровень</option>
+                                            <option value="Нет образования" {% if family and family.father_education_info == 'Нет образования' %}selected{% endif %}>Нет образования</option>
+                                            <option value="Начальное" {% if family and family.father_education_info == 'Начальное' %}selected{% endif %}>Начальное</option>
+                                            <option value="Среднее" {% if family and family.father_education_info == 'Среднее' %}selected{% endif %}>Среднее</option>
+                                            <option value="Среднее профессиональное" {% if family and family.father_education_info == 'Среднее профессиональное' %}selected{% endif %}>Среднее профессиональное</option>
+                                            <option value="Высшее" {% if family and family.father_education_info == 'Высшее' %}selected{% endif %}>Высшее</option>
+                                            <option value="Послевузовское" {% if family and family.father_education_info == 'Послевузовское' %}selected{% endif %}>Послевузовское</option>
+                                        </select>
+                                    </div>
+                                    <div class="profile-detail">
+                                        <div class="detail-label">Социальный статус</div>
+                                        <select class="type-select-disabled" name="father_social_status" id='Dadstatus' style="width: 50%">
+                                            <option value="">Выберите статус</option>
+                                            <option value="Безработный" {% if family and family.father_social_status == 'Безработный' %}selected{% endif %}>Безработный</option>
+                                            <option value="Инвалид" {% if family and family.father_social_status == 'Инвалид' %}selected{% endif %}>Инвалид</option>
+                                            <option value="Пенсионер" {% if family and family.father_social_status == 'Пенсионер' %}selected{% endif %}>Пенсионер</option>
+                                            <option value="Работающий" {% if family and family.father_social_status == 'Работающий' %}selected{% endif %}>Работающий</option>
+                                            <option value="Самозанятый" {% if family and family.father_social_status == 'Самозанятый' %}selected{% endif %}>Самозанятый</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br><br>
+                        <div class="section-actions">
+                            <button class="custom-button" type="submit">Редактировать</button>
+                        </div>
+                        <br><br>
+                    </form>
+                </section>
+
+                <section class="section guardian-section {% if active_tab == 'family_guardian' %}active{% endif %}">
+                    <form action="{{ url_for('student.student_main_pa', user_id=current_user.account_id)}}" method="POST" id="form_id" onsubmit="event.preventDefault();">
+                        <input type="hidden" name="current_tab" value="{{ active_tab }}">
+                        <div class="parent-details">
+                            <div class="type-selection">
+                                <div class="profile-detail">
+                                    <div class="detail-label">Наличие опекуна</div>
+                                    <select class="type-select-disabled" id='par' name="guardian_parent_type">
+                                        <option value="">Выберите</option>
+                                        <option value="Нету" {% if family and family.guardian_parent_type == 'Нету' %}selected{% endif %}>Нету</option>
+                                        <option value="Есть" {% if family and family.guardian_parent_type == 'Есть' %}selected{% endif %}>Есть</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="profile-details" style="display: {% if family and family.guardian_parent_type == 'Нету' %}none{% else %}block{% endif %}">
+                                <div class="profile-detail">
+                                    <div class="detail-label">Фамилия</div>
+                                    <input class="edit-input" name="guardian_surname" value="{{ family.guardian_surname if family and family.guardian_surname is not none else '' }}" disabled=true>
+                                </div>
+                                <div class="profile-detail">
+                                    <div class="detail-label">Имя</div>
+                                    <input class="edit-input" name="guardian_name" value="{{ family.guardian_name if family and family.guardian_name is not none else '' }}" disabled=true>
+                                </div>
+                                <div class="profile-detail">
+                                    <div class="detail-label">Отчество</div>
+                                    <input class="edit-input" name="guardian_last_name" value="{{ family.guardian_last_name if family and family.guardian_last_name is not none else '' }}" disabled=true>
+                                </div>
+                                <div class="profile-detail">
+                                    <div class="detail-label">Телефон</div>
+                                    <input class="edit-input" name="guardian_phone_number" value="{{ family.guardian_phone_number if family and family.guardian_phone_number is not none else '' }}" disabled=true>
+                                </div>
+                                <div class="profile-detail">
+                                    <div class="detail-label">Дата Рождения </div>
+                                    <input class="edit-input" name="guardian_birthday" type='date' value="{{ family.guardian_birthday.strftime('%Y-%m-%d') if family and family.guardian_birthday is not none else '' }}" disabled=true>
+                                </div>
+                                
+                                <br><br>
+                                <div class="detail-label" style="transform: translate(-50%, -50%); position: absolute; left: 50%; text-align: center;">Дополнительная информация</div>
+                                <br><br>
+                                
+                                <div class="profile-details">
+                                    <div class="profile-detail">
+                                        <div class="detail-label">Место Работы</div>
+                                        <input class="edit-input" name="guardian_workplace" value="{{ family.guardian_workplace if family and family.guardian_workplace is not none else '' }}" disabled=true>
+                                    </div>
+                                    <div class="profile-detail">
+                                        <div class="detail-label">Сведения об образовании</div>
+                                        <select class="type-select-disabled" name="guardian_education_info" id='educationguard' style="width: 65%;">
+                                            <option value="">Выберите уровень</option>
+                                            <option value="Нет образования" {% if family and family.guardian_education_info == 'Нет образования' %}selected{% endif %}>Нет образования</option>
+                                            <option value="Начальное" {% if family and family.guardian_education_info == 'Начальное' %}selected{% endif %}>Начальное</option>
+                                            <option value="Среднее" {% if family and family.guardian_education_info == 'Среднее' %}selected{% endif %}>Среднее</option>
+                                            <option value="Среднее профессиональное" {% if family and family.guardian_education_info == 'Среднее профессиональное' %}selected{% endif %}>Среднее профессиональное</option>
+                                            <option value="Высшее" {% if family and family.guardian_education_info == 'Высшее' %}selected{% endif %}>Высшее</option>
+                                            <option value="Послевузовское" {% if family and family.guardian_education_info == 'Послевузовское' %}selected{% endif %}>Послевузовское</option>
+                                        </select>
+                                    </div>
+                                    <div class="profile-detail">
+                                        <div class="detail-label">Социальный статус</div>
+                                        <select class="type-select-disabled" name="guardian_social_status" id='Guardstatus' style="width: 50%">
+                                            <option value="">Выберите статус</option>
+                                            <option value="Безработный" {% if family and family.guardian_social_status == 'Безработный' %}selected{% endif %}>Безработный</option>
+                                            <option value="Инвалид" {% if family and family.guardian_social_status == 'Инвалид' %}selected{% endif %}>Инвалид</option>
+                                            <option value="Пенсионер" {% if family and family.guardian_social_status == 'Пенсионер' %}selected{% endif %}>Пенсионер</option>
+                                            <option value="Работающий" {% if family and family.guardian_social_status == 'Работающий' %}selected{% endif %}>Работающий</option>
+                                            <option value="Самозанятый" {% if family and family.guardian_social_status == 'Самозанятый' %}selected{% endif %}>Самозанятый</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br><br>
+                        <div class="section-actions">
+                            <button class="custom-button" type="submit">Редактировать</button>
+                        </div>
+                        <br><br>
+                    </form>
+                </section>
+        </section>
+
+        <section class="section adress-section {% if active_tab == 'adress' or active_tab=='adressReg' or active_tab == 'adressLive' or active_tab== 'adressCameFrom'%}active{% endif %}">
+            <div class="poll-tabs">
+                <a href="{{ url_for('student.student_main_pa', user_id=current_user.account_id, tab='adressLive') }}" 
+                class="poll-tab {% if active_tab == 'adressLive' %}active{% endif %}">Адрес проживания</a>
+                <a href="{{ url_for('student.student_main_pa', user_id=current_user.account_id, tab='adressReg') }}" 
+                class="poll-tab {% if active_tab == 'adressReg' %}active{% endif %}">Адрес прописки</a>
+                <a href="{{ url_for('student.student_main_pa', user_id=current_user.account_id, tab='adressCameFrom') }}" 
+                class="poll-tab {% if active_tab == 'adressCameFrom' %}active{% endif %}">Откуда прибыл</a>
+            </div>
+            {# Address Section - Live Address #}
+            <section class="section livPlace-section {% if active_tab == 'adressLive' %}active{% endif %}">
+                <form action="{{ url_for('student.student_main_pa', user_id=current_user.account_id)}}" method="POST" id="form_id" onsubmit="event.preventDefault();">
+                    <input type="hidden" name="current_tab" value="{{ active_tab }}">
+                    <div class="profile-details">
+                        <div class="profile-detail">
+                            <div class="detail-label">Город</div>
+                            <input class="edit-input" name="live-City" value="{{ info.live_address.city if info and info.live_address and info.live_address.city is not none else '' }}" disabled=true>
+                        </div>
+                        <div class="profile-detail">
+                            <div class="detail-label">Район</div>
+                            <input class="edit-input" name="live-District" value="{{ info.live_address.district if info and info.live_address and info.live_address.district is not none else '' }}" disabled=true>
+                        </div>
+                        <div class="profile-detail">
+                            <div class="detail-label">Улица</div>
+                            <input class="edit-input" name="live-Street" value="{{ info.live_address.street if info and info.live_address and info.live_address.street is not none else '' }}" disabled=true>
+                        </div>
+                        <div class="profile-detail">
+                            <div class="detail-label">Дом</div>
+                            <input class="edit-input" name="live-House" value="{{ info.live_address.house if info and info.live_address and info.live_address.house is not none else '' }}" disabled=true>
+                        </div>
+                        <div class="profile-detail">
+                            <div class="detail-label">Подъезд</div>
+                            <input class="edit-input" name="live-Entrance" value="{{ info.live_address.entrance if info and info.live_address and info.live_address.entrance is not none else '' }}" disabled=true>
+                        </div>
+                        <div class="profile-detail">
+                            <div class="detail-label">Этаж</div>
+                            <input class="edit-input" name="live-Floor" value="{{ info.live_address.floor if info and info.live_address and info.live_address.floor is not none else '' }}" disabled=true>
+                        </div>
+                        <div class="profile-detail">
+                            <div class="detail-label">Квартира</div>
+                            <input class="edit-input" name="live-Flat" value="{{ info.live_address.flat if info and info.live_address and info.live_address.flat is not none else '' }}" disabled=true>
+                        </div>
+                    </div>
+                    <br><br>
+                    <div class="detail-label" style="transform: translate(-50%, -50%); position: absolute; left: 50%; text-align: center;">Дополнительная информация</div>
+                    <br><br>
+                    <div class="profile-details">
+                        <div class="profile-detail">
+                            <div class="detail-label">С кем проживает</div>
+                            <input class="edit-input" name="live_with_whom" value="{{ info.live_with_whom if info and info.live_with_whom is not none else '' }}" disabled=true>
+                        </div>
+                        <div class="profile-detail">
+                            <div class="detail-label">Форма собственности</div>
+                            <select class="type-select-disabled" name="ownership_form" id='livform'>
+                                <option value="" {% if not info or not info.ownership_form %}selected{% endif %}>Выберите</option>
+                                <option value="Собственная" {% if info and info.ownership_form == 'Собственная' %}selected{% endif %}>Собственная</option>
+                                <option value="Съемная" {% if info and info.ownership_form == 'Съемная' %}selected{% endif %}>Съемная</option>
+                                <option value="Общежитие" {% if info and info.ownership_form == 'Общежитие' %}selected{% endif %}>Общежитие</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="section-actions">
+                        <button class="custom-button">Редактировать</button>
+                    </div>
+                    <br><br>
+                </form>
+            </section>
+            
+            {# Address Section - Registration Address #}
+            <section class="section regPlace-section {% if active_tab == 'adressReg' %}active{% endif %}">
+                <form action="{{ url_for('student.student_main_pa', user_id=current_user.account_id)}}" method="POST" id="form_id" onsubmit="event.preventDefault();">
+                    <input type="hidden" name="action" id="actionInput" value="adressLive">
+                    <input type="hidden" name="current_tab" value="{{ active_tab }}">
+                    <div class="profile-details">
+                        <div class="profile-detail">
+                            <div class="detail-label">Страна</div>
+                            <input class="edit-input" name="reg-country" value="{{ info.where_country if info and info.where_country is not none else '' }}" disabled=true>
+                        </div>
+                        <div class="profile-detail">
+                            <div class="detail-label">Город</div>
+                            <input class="edit-input" name="reg-City" value="{{ info.reg_address.city if info and info.reg_address and info.reg_address.city is not none else '' }}" disabled=true>
+                        </div>
+                        <div class="profile-detail">
+                            <div class="detail-label">Район</div>
+                            <input class="edit-input" name="reg-District" value="{{ info.reg_address.district if info and info.reg_address and info.reg_address.district is not none else '' }}" disabled=true>
+                        </div>
+                        <div class="profile-detail">
+                            <div class="detail-label">Улица</div>
+                            <input class="edit-input" name="reg-Street" value="{{ info.reg_address.street if info and info.reg_address and info.reg_address.street is not none else '' }}" disabled=true>
+                        </div>
+                        <div class="profile-detail">
+                            <div class="detail-label">Дом</div>
+                            <input class="edit-input" name="reg-House" value="{{ info.reg_address.house if info and info.reg_address and info.reg_address.house is not none else '' }}" disabled=true>
+                        </div>
+                        <div class="profile-detail">
+                            <div class="detail-label">Подъезд</div>
+                            <input class="edit-input" name="reg-Entrance" value="{{ info.reg_address.entrance if info and info.reg_address and info.reg_address.entrance is not none else '' }}" disabled=true>
+                        </div>
+                        <div class="profile-detail">
+                            <div class="detail-label">Этаж</div>
+                            <input class="edit-input" name="reg-Floor" value="{{ info.reg_address.floor if info and info.reg_address and info.reg_address.floor is not none else '' }}" disabled=true>
+                        </div>
+                        <div class="profile-detail">
+                            <div class="detail-label">Квартира</div>
+                            <input class="edit-input" name="reg-Flat" value="{{ info.reg_address.flat if info and info.reg_address and info.reg_address.flat is not none else '' }}" disabled=true>
+                        </div>
+                    </div>
+                    <br><br>
+                    <div class="section-actions">
+                        <button class="custom-button">Редактировать</button>
+                    </div>
+                    <br><br>
+                </form>
+            </section>
+            
+            {# Address Section - Came From #}
+            <section class="section cameFrom-section {% if active_tab == 'adressCameFrom' %}active{% endif %}">
+                <form action="{{ url_for('student.student_main_pa', user_id=current_user.account_id)}}" method="POST" id="form_id" onsubmit="event.preventDefault();">
+                    <input type="hidden" name="current_tab" value="{{ active_tab }}">
+                    <div class="profile-details">
+                        <div class="profile-detail">
+                            <div class="detail-label">Страна</div>
+                            <input class="edit-input" name="cameFrom-country" value="{{ info.from_where_country if info and info.from_where_country is not none else '' }}" disabled=true>
+                        </div>
+                        <div class="profile-detail">
+                            <div class="detail-label">Город</div>
+                            <input class="edit-input" name="cameFrom-City" value="{{ info.ex_address.city if info and info.ex_address and info.ex_address.city is not none else '' }}" disabled=true>
+                        </div>
+                        <div class="profile-detail">
+                            <div class="detail-label">Район</div>
+                            <input class="edit-input" name="cameFrom-District" value="{{ info.ex_address.district if info and info.ex_address and info.ex_address.district is not none else '' }}" disabled=true>
+                        </div>
+                        <div class="profile-detail">
+                            <div class="detail-label">Улица</div>
+                            <input class="edit-input" name="cameFrom-Street" value="{{ info.ex_address.street if info and info.ex_address and info.ex_address.street is not none else '' }}" disabled=true>
+                        </div>
+                        <div class="profile-detail">
+                            <div class="detail-label">Дом</div>
+                            <input class="edit-input" name="cameFrom-House" value="{{ info.ex_address.house if info and info.ex_address and info.ex_address.house is not none else '' }}" disabled=true>
+                        </div>
+                        <div class="profile-detail">
+                            <div class="detail-label">Подъезд</div>
+                            <input class="edit-input" name="cameFrom-Entrance" value="{{ info.ex_address.entrance if info and info.ex_address and info.ex_address.entrance is not none else '' }}" disabled=true>
+                        </div>
+                        <div class="profile-detail">
+                            <div class="detail-label">Этаж</div>
+                            <input class="edit-input" name="cameFrom-Floor" value="{{ info.ex_address.floor if info and info.ex_address and info.ex_address.floor is not none else '' }}" disabled=true>
+                        </div>
+                        <div class="profile-detail">
+                            <div class="detail-label">Квартира</div>
+                            <input class="edit-input" name="cameFrom-Flat" value="{{ info.ex_address.flat if info and info.ex_address and info.ex_address.flat is not none else '' }}" disabled=true>
+                        </div>
+                    </div>
+                    <br><br>
+                    <div class="detail-label" style="transform: translate(-50%, -50%); position: absolute; left: 50%; text-align: center;">Дополнительная информация</div>
+                    <br><br>
+                    <div class="profile-details">
+                        <div class="profile-detail">
+                            <div class="detail-label">Школа</div>
+                            <input class="edit-input" name="cameFrom-school" value="{{ info.ex_school if info and info.ex_school is not none else '' }}" disabled=true>
+                        </div>
+                    </div>
+                    <br><br>
+                    <div class="section-actions">
+                        <button class="custom-button">Редактировать</button>
+                    </div>
+                    <br><br>
+                </form>
+            </section>
+            
+        </section>
+
+    </div>
+</body>
+</html>

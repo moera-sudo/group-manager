@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="user-id" content="{{ current_user.account_id }}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/EventsPage.css') }}">
+
+    <script>
+        function submitTabForm(tabValue) {
+            document.getElementById('tabInput').value = tabValue;
+            document.getElementById('tabForm').submit();
+        }
+
+    </script>
+    <script src="{{ url_for('static', filename='js/admin/EventsPage.js') }}"></script>
+
+    
+
+    <title>События</title>
+    
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="header-title">События</h1>
+            <div class="header-icons">
+                <i class="material-icons header-icon" id="addEventBtn">add</i>
+                <select id="GroupTag" class="header-select" name="group">
+                    <option value="">Для всех</option>
+                    {% for group in group_list %}
+                    <option value="{{group.group_id}}">{{ group.group_name }}</option>
+                    {%endfor%}
+                </select>
+            </div>
+        </header>
+
+        <div class="poll-tabs">
+            <!-- Отправка url запросов на сервер для проведения фильтрации -->
+            <a href="{{ url_for('admin.admin_main_events', user_id=current_user.account_id, tab='all') }}" 
+               class="poll-tab {% if active_tab == 'all' %}active{% endif %}">Все</a>
+
+            <a href="{{ url_for('admin.admin_main_events', user_id=current_user.account_id, tab='future') }}" 
+               class="poll-tab {% if active_tab == 'future' %}active{% endif %}">Предстоящие</a>
+
+            <a href="{{ url_for('admin.admin_main_events', user_id=current_user.account_id, tab='past') }}" 
+               class="poll-tab {% if active_tab == 'past' %}active{% endif %}">Прошедшие</a>
+        </div>
+
+        <div class="events-section">
+            {% for event in events %}
+            <div class="event-card" data-event-id="{{ event.event_id }}" data-user-id="{{ current_user.account_id }}">
+                <div class="event-icon">
+                    <i class="material-icons">{{ event.icon }}</i>
+                </div>
+                <div class="event-details">
+                    <div class="event-title">{{ event.title }}</div>
+                    <div class="event-date">{{ event.date.strftime('%d %B %Y') }}</div>
+                    <span class="event-tag">{{ "Для всех" if event.group_id == None else event.group.group_name }}</span>
+                </div>
+                <div class="event-actions">
+                    <i class="material-icons event-action-icon edit-event">edit</i>
+                    <i class="material-icons event-action-icon delete-event">delete</i>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+        <br><br><br><br>
+
+        <nav>
+            <a href="{{ url_for('admin.admin_main_posts', user_id=current_user.account_id) }}" class="nav-item ">
+                <i class="material-icons">announcement</i>
+                <span>Объявление</span>
+            </a>
+            <a href="" class="nav-item active">
+                <i class="material-icons">event</i>
+                <span>События</span>
+            </a>
+            <a href="{{  url_for('admin.admin_main_view', user_id=current_user.account_id)  }}" class="nav-item">
+                <i class="material-icons">home</i>
+                <span>Главная</span>
+            </a>
+            <a href="{{ url_for('admin.admin_main_votes', user_id=current_user.account_id) }}" class="nav-item">
+                <i class="material-icons">poll</i>
+                <span>Опросы</span>
+            </a>
+            <a href="{{ url_for('admin.admin_main_group', user_id=current_user.account_id) }}" class="nav-item">
+                <i class="material-icons">group</i>
+                <span>Группа</span>
+            </a>
+        </nav>
+
+        <div id="eventModal" class="modal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); padding-top:50px;">
+            <div class="modal-content" style="background-color:white; margin:5% auto; padding:20px; border-radius:10px; width:90%; max-width:390px;">
+                <h2 id="modalTitle">Добавить событие</h2>
+                <form id="eventForm", method="POST", action="{{ url_for('admin.admin_main_events', user_id=current_user.account_id) }}">
+                    <input type="hidden" id="eventId" name="eventId" value="">
+                    <input type="hidden" name="group_id" value="{{ request.args.get('group', '') }}">
+                    <input type="hidden" id="action" name="action" value="create">
+                    <div style="margin-bottom:10px;">
+                        <label for="eventTitle">Название события:</label>
+                        <input type="text" id="eventTitle" name="eventTitle" required style="width:100%; padding:8px; margin-top:5px;">
+                    </div>
+                    <div style="margin-bottom:10px;">
+                        <label for="eventDate">Дата события:</label>
+                        <input type="date" id="eventDate" name="eventDate"required style="width:100%; padding:8px; margin-top:5px;">
+                    </div>
+                    <div style="margin-bottom:10px;">
+                        <label for="eventIcon">Иконка:</label>
+                        <select id="eventIcon" name="eventIcon1" style="width:100%; padding:8px; margin-top:5px;">
+                            <option value="card_giftcard">Подарок</option>
+                            <option value="celebration">Праздник</option>
+                            <option value="group">Группа</option>
+                        </select>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <button type="submit" id="editEventBtn" style="background-color:#2563eb; color:white; border:none; padding:10px 20px; border-radius:8px;">Сохранить</button>
+                        
+                        <button type="button" id="cancelBtn" style="background-color:#f3f4f6; color:#374151; border:none; padding:10px 20px; border-radius:8px;">Отмена</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

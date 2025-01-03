@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/headman/HomePage.css') }}">
+    <script src="{{ url_for('static', filename='/headman/HomePage.js') }}"></script>
+
+    <title>Главная</title>
+    
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="group-info">
+                <h1 class="group-name">{{group_name }}</h1>
+            </div>
+            <div class="header-icons">
+                <a href="{{ url_for('headman.head_main_pa', user_id=current_user.account_id) }}"><i class="material-icons">account_circle</i></a>
+                <a href="{{ url_for('auth.log_out', user_id=current_user.account_id) }}"><i class="material-icons header-icon">logout</i></a>
+            </div>
+        </header>
+
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">События</h2>
+                <a href="./EventsPage.html" class="view-all">Все →</a>
+            </div>
+            {% for event in events %}
+            <div class="card">
+                <div class="card-icon">
+                    <i class="material-icons">{{ event.icon }}</i>
+                </div>
+                <div class="card-content">
+                    <div class="card-title">{{ event.title }}</div>
+                    <div class="card-subtitle">{{ event.date.strftime('%d %B %Y') }}</div>
+                </div>
+                
+            </div>
+            {%endfor%}
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">Опросы</h2>
+                <a href="./VotePage.html" class="view-all">Все →</a>
+            </div>
+            {% for vote in votes %}
+            <div class="card">
+                <div class="card-content">
+                    <div class="card-title">{{ vote.title }}</div>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: 0%"></div>
+                    </div>
+                    <div class="card-subtitle">0 ответов</div>
+                </div>
+                
+            </div>
+            {%endfor%}
+        </section>
+        <br><br><br><br>
+
+        <nav>
+            <a href="{{ url_for('headman.head_main_posts', user_id=current_user.account_id) }}" class="nav-item ">
+                <i class="material-icons">announcement</i>
+                <span>Объявление</span>
+            </a>
+            <a href="{{ url_for('headman.head_main_events', user_id=current_user.account_id) }}" class="nav-item">
+                <i class="material-icons">event</i>
+                <span>События</span>
+            </a>
+            <a href="" class="nav-item active">
+                <i class="material-icons">home</i>
+                <span>Главная</span>
+            </a>
+            <a href="{{ url_for('headman.head_main_votes', user_id=current_user.account_id) }}" class="nav-item">
+                <i class="material-icons">poll</i>
+                <span>Опросы</span>
+            </a>
+            <a href="{{ url_for('headman.head_main_group', user_id=current_user.account_id) }}" class="nav-item">
+                <i class="material-icons">group</i>
+                <span>Группа</span>
+            </a>
+        </nav>
+    </div>
+</body>
+</html>

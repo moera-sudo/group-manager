@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/student/AnnouncementPage.css') }}">
+    <script src="{{ url_for('static', filename='js/student/AnnouncementPage.js') }}"></script>
+    <title>Объявления</title>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="header-title">Объявления</h1>
+            <div class="header-icons">
+            </div>
+        </header>
+
+        <section class="announcement-section" name=>
+            {% for post in posts %}
+            <div class="announcement-card"  data-post-id="{{ post.post_id }}" data-user-id="{{ current_user.account_id }}">
+                <div class="announcement-actions">
+                    <i class="material-icons announcement-action-icon edit-announcement">edit</i>
+                    <i class="material-icons announcement-action-icon delete-announcement">delete</i>
+                </div>
+                <div class="announcement-date">{{ post.creation_date.strftime('%d %B %Y') }}</div>
+                <h2 class="announcement-title">{{ post.title }}</h2>
+                <p class="announcement-content">{{ post.content }}</p>
+                <span class="announcement-tag">{{ post.category }}</span>
+            </div>
+            {% endfor %}
+        </section>
+
+        <br><br><br><br>
+
+        <nav>
+            <a href="" class="nav-item active">
+                <i class="material-icons">announcement</i>
+                <span>Объявление</span>
+            </a>
+            <a href="{{ url_for('student.student_main_events', user_id=current_user.account_id) }}" class="nav-item">
+                <i class="material-icons">event</i>
+                <span>События</span>
+            </a>
+            <a href="{{ url_for('student.student_main_view', user_id=current_user.account_id) }}" class="nav-item">
+                <i class="material-icons">home</i>
+                <span>Главная</span>
+            </a>
+            <a href="{{ url_for('student.student_main_votes', user_id=current_user.account_id) }}" class="nav-item">
+                <i class="material-icons">poll</i>
+                <span>Опросы</span>
+            </a>
+            <a href="{{ url_for('student.student_main_group', user_id=current_user.account_id) }}" class="nav-item">
+                <i class="material-icons">group</i>
+                <span>Группа</span>
+            </a>
+        </nav>
+    </div>
+</body>
+</html>

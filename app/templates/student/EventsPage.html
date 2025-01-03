@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="user-id" content="{{ current_user.account_id }}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/student/EventsPage.css') }}">
+
+    <script>
+        function submitTabForm(tabValue) {
+            document.getElementById('tabInput').value = tabValue;
+            document.getElementById('tabForm').submit();
+        }
+
+    </script>
+    <script src="{{ url_for('static', filename='js/student/EventsPage.js') }}"></script>
+
+    
+
+    <title>События</title>
+    
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="header-title">События</h1>
+            <div class="header-icons">
+            </div>
+        </header>
+
+        <div class="poll-tabs">
+            <!-- Отправка url запросов на сервер для проведения фильтрации -->
+            <a href="{{ url_for('student.student_main_events', user_id=current_user.account_id, tab='all') }}" 
+               class="poll-tab {% if active_tab == 'all' %}active{% endif %}">Все</a>
+
+            <a href="{{ url_for('student.student_main_events', user_id=current_user.account_id, tab='future') }}" 
+               class="poll-tab {% if active_tab == 'future' %}active{% endif %}">Предстоящие</a>
+
+            <a href="{{ url_for('student.student_main_events', user_id=current_user.account_id, tab='past') }}" 
+               class="poll-tab {% if active_tab == 'past' %}active{% endif %}">Прошедшие</a>
+        </div>
+
+        <div class="events-section">
+            {% for event in events %}
+            <div class="event-card" data-event-id="{{ event.event_id }}" data-user-id="{{ current_user.account_id }}">
+                <div class="event-icon">
+                    <i class="material-icons">{{ event.icon }}</i>
+                </div>
+                <div class="event-details">
+                    <div class="event-title">{{ event.title }}</div>
+                    <div class="event-date">{{ event.date.strftime('%d %B %Y') }}</div>
+                </div>
+                <div class="event-actions">
+                    <i class="material-icons event-action-icon edit-event">edit</i>
+                    <i class="material-icons event-action-icon delete-event">delete</i>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+        <br><br><br><br>
+
+        <nav>
+            <a href="{{ url_for('student.student_main_posts', user_id=current_user.account_id) }}" class="nav-item ">
+                <i class="material-icons">announcement</i>
+                <span>Объявление</span>
+            </a>
+            <a href="" class="nav-item active">
+                <i class="material-icons">event</i>
+                <span>События</span>
+            </a>
+            <a href="{{ url_for('student.student_main_view', user_id=current_user.account_id) }}" class="nav-item">
+                <i class="material-icons">home</i>
+                <span>Главная</span>
+            </a>
+            <a href="{{ url_for('student.student_main_votes', user_id=current_user.account_id) }}" class="nav-item">
+                <i class="material-icons">poll</i>
+                <span>Опросы</span>
+            </a>
+            <a href="{{ url_for('student.student_main_group', user_id=current_user.account_id) }}" class="nav-item">
+                <i class="material-icons">group</i>
+                <span>Группа</span>
+            </a>
+        </nav>
+    </div>
+</body>
+</html>

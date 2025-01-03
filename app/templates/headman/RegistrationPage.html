@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/headman/RegistrationPage.css') }}">
+    <script src="{{ url_for('static', filename='js/headman/RegistrationPage.js') }}"></script>
+    <title>Староста | Вход</title>
+</head>
+<body>
+    <div id="registrationContainer" style="display: flex;">
+        <div class="container">
+            <div class="auth-header">
+                <h1>Group Manager</h1>
+                <p>Создайте аккаунт</p>
+            </div>
+            {% with messages = get_flashed_messages(with_categories=True) %}
+                {% if messages %}
+                    <ul class="flash-messages">
+                        {% for category, message in messages %}
+                            <li class="flash {{ category }}">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+    
+            <form class="auth-form" id="registrationForm" action="{{ url_for('headman.head_reg_view') }}" method="post">
+                <div class="form-group">
+                    <i class="material-icons icon">person</i>
+                    <input type="text" id="r_fullname" name="r_fullname" placeholder="Фамилия Имя" required>
+                    <div class="error-message" id="nameError"></div>
+                </div> 
+    
+                <div class="form-group">
+                    <i class="material-icons icon">mail</i>
+                    <input type="email" id="r_email" name="r_email" placeholder="Электронная почта" required>
+                </div>
+    
+                <div class="form-group">
+                    <i class="material-icons icon">class</i>
+                    <input type="text" id="r_group" name="r_group" placeholder="Группа" required>
+                </div>
+    
+                <div class="form-group">
+                    <i class="material-icons icon">lock</i>
+                    <input type="password" id="r_password" name="r_password" placeholder="Пароль" required>
+                    <i class="material-icons password-toggle">visibility_off</i>
+                    
+                </div>
+                
+                <div class="form-group">
+                    <i class="material-icons icon">lock</i>
+                    <input type="password" id="r_confirm_password" name="r_confirm_password" placeholder="Подтвердите пароль" required>
+                    <i class="material-icons password-toggle">visibility_off</i>
+                </div>
+                <div class="error-message" id="passwordError"></div>
+    
+                <button type="submit" class="submit-btn">Зарегистрироваться</button>
+    
+                <div class="auth-switch">
+                    Уже есть аккаунт? <a href="{{ url_for('auth.auth_view') }}" id="loginLink">Войти</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

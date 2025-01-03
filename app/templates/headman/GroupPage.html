@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="group_list" content='{{ group_list_json|safe }}'>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/headman/GroupPage.css') }}">
+    <script src="{{ url_for('static', filename='js/headman/GroupPage.js') }}"></script>
+
+    <title>Группа</title>
+
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="header-title">Группа</h1>
+            <div>
+                <h class="header-text">ПО2306</i>
+            </div>
+        </header>
+
+        <div class="poll-tabs">
+            <div class="poll-tab active" data-tab="load">Список </div>
+            <div class="poll-tab" data-tab="info">Информация</div>
+        </div>
+
+        <section class="section info-section">
+            <div class="profile-details">
+                <div class="profile-detail">
+                    <div class="detail-label">Группа</div>
+                    <div class="detail-value">{{ group_info.group_name }}</div>
+                </div>
+                <div class="profile-detail">
+                    <div class="detail-label">Код группы</div>
+                    <div class="detail-value">{{ group_info.group_code }}</div>
+                </div>
+                <div class="profile-detail">
+                    <div class="detail-label">Куратор</div>
+                    <div class="detail-value">
+                        {% if group_info.courator %}
+                            {{ group_info.courator }}
+                        {% else %}
+                            <!-- Если значение None, оставляем поле пустым -->
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="profile-detail">
+                    <div class="detail-label">Староста</div>
+                    <div class="detail-value">
+                        {% if group_info.headman %}
+                            {{ group_info.headman }}
+                        {% else %}
+                            <!-- Если значение None, оставляем поле пустым -->
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="profile-detail">
+                    <div class="detail-label">Количество студентов </div>
+                    <div class="detail-value">{{ students_count }}</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section load-section active">
+            <div class="button-container">
+                <form action="{{ url_for('headman.head_main_group', user_id=current_user.account_id) }}" method="POST">
+                <button class="custom-button" type="submit">
+                    Выгрузить
+                </button>
+                </form>
+            </div>
+            <table id="studentsTable">
+                <thead>
+                    <tr>
+                        <th>№</th>
+                        <th>ФИО</th>
+                    </tr>
+                    
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </section>
+
+        <br><br><br><br>
+        <nav>
+            <a href="{{ url_for('headman.head_main_posts', user_id=current_user.account_id) }}" class="nav-item ">
+                <i class="material-icons">announcement</i>
+                <span>Объявление</span>
+            </a>
+            <a href="{{ url_for('headman.head_main_events', user_id=current_user.account_id) }}" class="nav-item">
+                <i class="material-icons">event</i>
+                <span>События</span>
+            </a>
+            <a href="{{ url_for('headman.head_main_view', user_id=current_user.account_id) }}"  class="nav-item">
+                <i class="material-icons">home</i>
+                <span>Главная</span>
+            </a>
+            <a href="{{ url_for('headman.head_main_votes', user_id=current_user.account_id) }}" class="nav-item">
+                <i class="material-icons">poll</i>
+                <span>Опросы</span>
+            </a>
+            <a href="" class="nav-item active">
+                <i class="material-icons">group</i>
+                <span>Группа</span>
+            </a>
+        </nav>
+    </div>
+    
+
+</body>
+</html>

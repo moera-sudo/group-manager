@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Авторизация</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/headman/AutorizePage.css') }}">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="{{ url_for('static', filename='js/headman/AutorizePage.js') }}"></script>
+
+
+</head>
+<body>
+    <div class="container">
+        <div class="auth-header">
+            <h1>Group Manager</h1>
+            <p>Вход в аккаунт</p>
+        </div>
+
+        <form class="auth-form" id="loginForm" method="post">
+            <div class="form-group">
+                <i class="material-icons icon">mail</i>
+                <input type="email" id="a_email" name="a_email" placeholder="Электронная почта" required>
+            </div>
+
+            <div class="form-group">
+                <i class="material-icons icon">lock</i>
+                <input type="password" id="a_password" name="a_password" placeholder="Пароль" required>
+                <i class="material-icons password-toggle">visibility_off</i>
+            </div>
+            <div class="error-message" id="passwordError"></div>
+
+            <button type="submit" class="submit-btn">Войти</button>
+
+            <div class="separator">
+                <span>или</span>
+            </div>
+
+            <div class="auth-switch" style="font-size:16px">
+                Нет аккаунта? 
+                <p>
+                <a href="{{ url_for('headman.head_reg_view')}}" id="registerLink" style="font-size:16px">Зарегистрироваться как староста</a>
+                </p>
+                <p>
+                <a href="{{ url_for('student.student_reg_view')}}" id="registerLink" style="font-size:16px">Зарегистрироваться как студент</a>
+                </p>
+                 
+                
+            </div>
+        </form>
+    </div>
+</body>
+</html>
